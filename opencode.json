@@ -40,10 +40,13 @@
       "touch": "allow",
       "date": "allow",
       "echo": "allow",
-      "printf": "allow"
+      "printf": "ask",
+      "rm": "ask"
     },
     "git": "deny",
-    "WebFetch": "ask"
+    "todowrite": "allow",
+    "webfetch": "ask",
+    "websearch": "ask"
   },
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**", ".opencode/**"]
