@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToK Essay Builder</title>
+<style>
+:root {
+  --primary: #0059B3;
+  --primary-light: #E8F0FE;
+  --primary-dark: #003D7A;
+  --bg: #FAFBFC;
+  --surface: #FFFFFF;
+  --text: #1A1A2E;
+  --text-secondary: #5A6A7A;
+  --text-muted: #8C9BA8;
+  --border: #DEE2E6;
+  --accent: #E8A838;
+  --accent-light: #FDF3E0;
+  --success: #2D9B4E;
+  --error: #D32F2F;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+  --radius: 8px;
+  --radius-sm: 4px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --max-width: 960px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: -0.3px;
+}
+
+.header h1 span { font-weight: 400; color: var(--text-secondary); }
+
+.progress-bar {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  height: 48px;
+}
+
+.progress-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.progress-step.active { color: var(--primary); font-weight: 600; }
+.progress-step.done { color: var(--success); }
+
+.progress-dot {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.progress-step.active .progress-dot {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+.progress-step.done .progress-dot {
+  border-color: var(--success);
+  background: var(--success);
+  color: white;
+}
+
+.progress-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  min-width: 8px;
+}
+
+.progress-line.done { background: var(--success); }
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.step { display: none; }
+.step.active { display: block; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+}
+
+.card h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.card p { color: var(--text-secondary); margin-bottom: 16px; }
+
+.title-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.title-option {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.title-option:hover { border-color: var(--primary-light); background: var(--primary-light); }
+
+.title-option.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.title-option .session-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-bottom: 4px;
+}
+
+.title-option .title-num {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+.title-option .title-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.session-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.session-tab {
+  flex: 1;
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--surface);
+  border: none;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+
+.session-tab:not(:last-child) { border-right: 1px solid var(--border); }
+
+.session-tab:hover { background: var(--primary-light); }
+.session-tab.active { background: var(--primary); color: white; }
+
+.form-group { margin-bottom: 20px; }
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-group .prompt {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  padding: 12px 16px;
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--primary);
+}
+
+.form-group textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 14px 16px;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  resize: vertical;
+  transition: border-color 0.15s;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0,89,179,0.1);
+}
+
+.form-group textarea::placeholder { color: var(--text-muted); }
+
+.pointers {
+  margin-top: 16px;
+  padding: 16px 20px;
+  background: var(--accent-light);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+}
+
+.pointers-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8B6B20;
+  margin-bottom: 8px;
+}
+
+.pointers ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pointers li {
+  font-size: 13px;
+  color: #6B4F18;
+  padding: 4px 0;
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.pointers li::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.nav-buttons .right { display: flex; gap: 12px; }
+
+.btn {
+  padding: 10px 24px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover { background: var(--bg); border-color: var(--text-muted); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.btn-outline:hover { background: var(--primary-light); }
+
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #218838; }
+
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.word-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 4px;
+}
+
+.review-section {
+  margin-bottom: 24px;
+}
+
+.review-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.review-section .content {
+  font-size: 15px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  color: var(--text);
+}
+
+.review-section .empty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.prescribed-title-display {
+  padding: 20px;
+  background: var(--primary-light);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  border-left: 4px solid var(--primary);
+}
+
+.prescribed-title-display .label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.prescribed-title-display .title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.info-box {
+  padding: 16px 20px;
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--primary);
+  margin-bottom: 20px;
+}
+
+.info-box p { margin-bottom: 0; font-size: 14px; }
+
+@media (max-width: 640px) {
+  .header { padding: 12px 16px; }
+  .header h1 { font-size: 17px; }
+  .container { padding: 20px 16px; }
+  .card { padding: 20px; }
+  .title-option { padding: 12px 16px; }
+  .title-option .title-text { font-size: 14px; }
+  .nav-buttons { flex-direction: column; }
+  .nav-buttons .right { width: 100%; }
+  .nav-buttons .right .btn { flex: 1; }
+  .btn { flex: 1; justify-content: center; }
+  .progress-bar { padding: 0 16px; gap: 2px; overflow-x: auto; }
+  .progress-step { font-size: 10px; }
+  .progress-step .step-label { display: none; }
+  .session-tabs { flex-direction: column; }
+  .session-tab:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border); }
+}
+
+.fade-in { animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <h1>ToK <span>Essay Builder</span></h1>
+    <div style="font-size:13px;color:var(--text-muted)">IB Diploma Programme</div>
+  </div>
+</header>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="container" id="app">
+
+  <!-- Step 0: Session & Title Selection -->
+  <div class="step active" data-step="0">
+    <div class="card fade-in">
+      <h2>Choose Your Prescribed Title</h2>
+      <p>Select your examination session, then pick one of the six prescribed titles to begin structuring your essay.</p>
+
+      <div class="session-tabs" id="sessionTabs">
+        <button class="session-tab active" data-session="0">November 2025</button>
+        <button class="session-tab" data-session="1">May 2026</button>
+      </div>
+
+      <div class="title-grid" id="titleGrid"></div>
+
+      <div class="nav-buttons">
+        <div></div>
+        <div class="right">
+          <button class="btn btn-primary" id="startBtn" disabled>Start Essay →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Steps 1-6: Essay Sections -->
+  <div class="step" data-step="1">
+    <div class="card fade-in">
+      <h2>Introduction</h2>
+      <div class="prescribed-title-display" id="ptDisplay1"></div>
+      <div class="form-group">
+        <div class="prompt">
+          <strong>Hook & Context:</strong> Open with a real-life situation or observation that connects to your title. Then state your thesis — your overall answer to the prescribed title — and briefly outline how you will argue it across your chosen Areas of Knowledge.
+        </div>
+        <textarea id="introInput" placeholder="Start writing your introduction..."></textarea>
+        <div class="word-count"><span id="introCount">0</span> words</div>
+      </div>
+      <div class="pointers">
+        <div class="pointers-title">Pointers</div>
+        <ul>
+          <li>State your thesis clearly — what is your direct answer to the prescribed title?</li>
+          <li>Mention both Areas of Knowledge you will discuss</li>
+          <li>Define any key terms from the prescribed title</li>
+          <li>Aim for 150-200 words — concise and focused</li>
+          <li>Avoid vague statements like "knowledge is important"</li>
+        </ul>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="goToStep(0)">← Back</button>
+        <div class="right">
+          <button class="btn btn-primary" onclick="goToStep(2)">Save & Continue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="2">
+    <div class="card fade-in">
+      <h2>Body Paragraph 1 — First Area of Knowledge</h2>
+      <div class="prescribed-title-display" id="ptDisplay2"></div>
+      <div class="form-group">
+        <div class="prompt">
+          <strong>Claim & Evidence:</strong> Make a clear claim that supports your thesis using your first AOK. Support it with a specific real-life example, case study, or scenario. Explain how this example demonstrates your point and what it reveals about the knowledge question.
+        </div>
+        <textarea id="body1Input" placeholder="Write your first body paragraph..."></textarea>
+        <div class="word-count"><span id="body1Count">0</span> words</div>
+      </div>
+      <div class="pointers">
+        <div class="pointers-title">Pointers</div>
+        <ul>
+          <li>Start with a clear topic sentence that makes a claim about the prescribed title</li>
+          <li>Use a specific, detailed real-life example — name names, dates, events</li>
+          <li>Analyse the example: what does it show about how knowledge works in this AOK?</li>
+          <li>Connect every sentence back to the prescribed title</li>
+          <li>Use TOK vocabulary: justification, evidence, methodology, perspective</li>
+        </ul>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+        <div class="right">
+          <button class="btn btn-primary" onclick="goToStep(3)">Save & Continue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="3">
+    <div class="card fade-in">
+      <h2>Body Paragraph 2 — Second Area of Knowledge</h2>
+      <div class="prescribed-title-display" id="ptDisplay3"></div>
+      <div class="form-group">
+        <div class="prompt">
+          <strong>Claim & Evidence:</strong> Now develop your argument through your second AOK. Make a claim that builds on or contrasts with your first paragraph. Use a different real-life example and analyse it thoroughly. How does this AOK offer a different perspective on the knowledge question?
+        </div>
+        <textarea id="body2Input" placeholder="Write your second body paragraph..."></textarea>
+        <div class="word-count"><span id="body2Count">0</span> words</div>
+      </div>
+      <div class="pointers">
+        <div class="pointers-title">Pointers</div>
+        <ul>
+          <li>Ensure this paragraph adds something new — not just a repeat of paragraph 1</li>
+          <li>Consider how this AOK's methods, scope, or assumptions differ</li>
+          <li>Your example should be as specific and well-developed as the first</li>
+          <li>Show tension or contrast between the two AOKs for stronger analysis</li>
+          <li>Keep asking: "So what?" — what are the implications for the prescribed title?</li>
+        </ul>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+        <div class="right">
+          <button class="btn btn-primary" onclick="goToStep(4)">Save & Continue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="4">
+    <div class="card fade-in">
+      <h2>Body Paragraph 3 — Counterclaim & Synthesis</h2>
+      <div class="prescribed-title-display" id="ptDisplay4"></div>
+      <div class="form-group">
+        <div class="prompt">
+          <strong>Counterclaim & Synthesis:</strong> Present a counterclaim or alternative perspective that challenges your thesis. Then synthesise — how do the different AOK perspectives come together? What is the most nuanced answer to the prescribed title? This paragraph shows you can see multiple sides of the issue.
+        </div>
+        <textarea id="body3Input" placeholder="Write your counterclaim and synthesis..."></textarea>
+        <div class="word-count"><span id="body3Count">0</span> words</div>
+      </div>
+      <div class="pointers">
+        <div class="pointers-title">Pointers</div>
+        <ul>
+          <li>A strong TOK essay acknowledges and addresses a counterclaim</li>
+          <li>The counterclaim should be genuine, not a straw man</li>
+          <li>Synthesise: don't just list both sides, show how they interact</li>
+          <li>This is where you demonstrate evaluative thinking — weighing competing claims</li>
+          <li>Use phrases like "However, one might argue that...", "On balance..."</li>
+        </ul>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="goToStep(3)">← Back</button>
+        <div class="right">
+          <button class="btn btn-primary" onclick="goToStep(5)">Save & Continue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="5">
+    <div class="card fade-in">
+      <h2>Conclusion</h2>
+      <div class="prescribed-title-display" id="ptDisplay5"></div>
+      <div class="form-group">
+        <div class="prompt">
+          <strong>Wrap Up & Answer:</strong> Summarise your argument without introducing new examples. Return directly to the prescribed title and give your final, considered answer. Reflect on the implications — what does your analysis say about the nature of knowledge itself?
+        </div>
+        <textarea id="conclusionInput" placeholder="Write your conclusion..."></textarea>
+        <div class="word-count"><span id="conclusionCount">0</span> words</div>
+      </div>
+      <div class="pointers">
+        <div class="pointers-title">Pointers</div>
+        <ul>
+          <li>No new examples or evidence in the conclusion</li>
+          <li>Explicitly answer the prescribed title — this is your final position</li>
+          <li>Synthesise what the comparison of AOKs has revealed about knowledge</li>
+          <li>Consider a wider implication or a question your essay opens up</li>
+          <li>Aim for 150-200 words</li>
+        </ul>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="goToStep(4)">← Back</button>
+        <div class="right">
+          <button class="btn btn-primary" onclick="goToStep(6)">Review Essay →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 6: Review & Export -->
+  <div class="step" data-step="6">
+    <div class="card fade-in">
+      <h2>Review Your Essay</h2>
+      <div class="prescribed-title-display" id="ptDisplay6"></div>
+      <p>Review your complete essay below. You can go back to edit any section, or export your essay as a .txt file.</p>
+
+      <div id="essayReview"></div>
+
+      <div class="info-box">
+        <p><strong>Total word count:</strong> <span id="totalWordCount">0</span> words (IB maximum: 1,600)</p>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="goToStep(5)">← Edit Sections</button>
+        <div class="right">
+          <button class="btn btn-success" onclick="exportEssay()">Download .txt ↓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SESSIONS = [
+  {
+    label: 'November 2025',
+    titles: [
+      { num: 1, text: 'For historians and artists, do conventions limit or expand their ability to produce knowledge? Discuss with reference to history and the arts.',
+        aoks: ['History', 'The Arts'] },
+      { num: 2, text: 'What is the relationship between knowing and understanding? Discuss with reference to two areas of knowledge.',
+        aoks: ['Any two AOKs'] },
+      { num: 3, text: 'Should knowledge in an area of knowledge be pursued for its own sake rather than its potential application? Discuss with reference to mathematics and one other area of knowledge.',
+        aoks: ['Mathematics', 'One other AOK'] },
+      { num: 4, text: 'To what extent do you agree that however the methods of an area of knowledge change, the scope remains the same? Answer with reference to two areas of knowledge.',
+        aoks: ['Any two AOKs'] },
+      { num: 5, text: 'In the pursuit of knowledge, is it possible or even desirable to set aside temporarily what we already know? Discuss with reference to the natural sciences and one other area of knowledge.',
+        aoks: ['Natural Sciences', 'One other AOK'] },
+      { num: 6, text: 'Is empathy an attribute that is equally important for a historian and a human scientist? Discuss with reference to history and the human sciences.',
+        aoks: ['History', 'Human Sciences'] }
+    ]
+  },
+  {
+    label: 'May 2026',
+    titles: [
+      { num: 1, text: 'In the production of knowledge, does it matter that observation is an essential but flawed tool? Discuss with reference to the natural sciences and one other area of knowledge.',
+        aoks: ['Natural Sciences', 'One other AOK'] },
+      { num: 2, text: 'To what extent do you agree that doubt is central to the pursuit of knowledge? Answer with reference to two areas of knowledge.',
+        aoks: ['Any two AOKs'] },
+      { num: 3, text: 'Is the power of knowledge determined by the way in which the knowledge is conveyed? Discuss with reference to mathematics and one other area of knowledge.',
+        aoks: ['Mathematics', 'One other AOK'] },
+      { num: 4, text: 'In the acquisition of knowledge, can we only understand something to the extent that we understand its context? Discuss with reference to two areas of knowledge.',
+        aoks: ['Any two AOKs'] },
+      { num: 5, text: 'To what extent do you agree with the claim that \u201Call things are numbers\u201D (Pythagoras)? Answer with reference to the arts and the human sciences.',
+        aoks: ['The Arts', 'Human Sciences'] },
+      { num: 6, text: 'To what extent is interpretation a reliable tool in the production of knowledge? Answer with reference to history and one other area of knowledge.',
+        aoks: ['History', 'One other AOK'] }
+    ]
+  }
+];
+
+const SECTION_NAMES = ['Introduction', 'Body Paragraph 1', 'Body Paragraph 2', 'Counterclaim & Synthesis', 'Conclusion'];
+const SECTION_KEYS = ['introduction', 'body1', 'body2', 'body3', 'conclusion'];
+const SECTION_INPUTS = ['introInput', 'body1Input', 'body2Input', 'body3Input', 'conclusionInput'];
+
+let state = {
+  session: 0,
+  titleIndex: -1,
+  sections: { introduction: '', body1: '', body2: '', body3: '', conclusion: '' },
+  currentStep: 0
+};
+
+function getTitle() {
+  if (state.titleIndex < 0) return null;
+  return SESSIONS[state.session].titles[state.titleIndex];
+}
+
+function renderTitleGrid() {
+  const grid = document.getElementById('titleGrid');
+  const session = SESSIONS[state.session];
+  grid.innerHTML = session.titles.map((t, i) => `
+    <div class="title-option ${state.titleIndex === i ? 'selected' : ''}" data-index="${i}">
+      <div>
+        <span class="session-badge">${session.label}</span>
+        <span class="title-num">Title ${t.num}</span>
+      </div>
+      <div class="title-text">${t.text}</div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.title-option').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.index);
+      state.titleIndex = idx;
+      renderTitleGrid();
+      updateChartStartBtn();
+    });
+  });
+}
+
+function updateChartStartBtn() {
+  const btn = document.getElementById('startBtn');
+  btn.disabled = state.titleIndex < 0;
+}
+
+function renderProgressBar() {
+  const bar = document.getElementById('progressBar');
+  const steps = ['Title', 'Intro', 'Body 1', 'Body 2', 'Counter', 'Conc', 'Review'];
+  const total = steps.length;
+  let html = '';
+  for (let i = 0; i < total; i++) {
+    const cls = i < state.currentStep ? 'done' : i === state.currentStep ? 'active' : '';
+    html += `<div class="progress-step ${cls}"><span class="progress-dot">${i + 1}</span><span class="step-label">${steps[i]}</span></div>`;
+    if (i < total - 1) html += `<div class="progress-line ${i < state.currentStep ? 'done' : ''}"></div>`;
+  }
+  bar.innerHTML = html;
+}
+
+function goToStep(step) {
+  if (step === 0) {
+    state.currentStep = 0;
+    showStep(0);
+    renderProgressBar();
+    return;
+  }
+
+  // From step selection to step 1: save title
+  if (state.currentStep === 0 && step === 1) {
+    const title = getTitle();
+    if (!title) return;
+  }
+
+  // Save current section text before moving
+  if (state.currentStep >= 1 && state.currentStep <= 5) {
+    const idx = state.currentStep - 1;
+    if (idx >= 0 && idx < SECTION_KEYS.length) {
+      state.sections[SECTION_KEYS[idx]] = document.getElementById(SECTION_INPUTS[idx]).value;
+    }
+  }
+
+  state.currentStep = step;
+
+  // Populate PT displays for upcoming steps
+  for (let s = 1; s <= 6; s++) {
+    const display = document.getElementById('ptDisplay' + s);
+    if (display) {
+      const title = getTitle();
+      display.innerHTML = title
+        ? `<div class="label">Prescribed Title</div><div class="title">${title.text}</div>`
+        : '';
+    }
+  }
+
+  // Populate textareas if coming back
+  if (step >= 1 && step <= 5) {
+    const idx = step - 1;
+    if (idx >= 0 && idx < SECTION_KEYS.length) {
+      document.getElementById(SECTION_INPUTS[idx]).value = state.sections[SECTION_KEYS[idx]] || '';
+    }
+  }
+
+  // Build review
+  if (step === 6) buildReview();
+
+  showStep(step);
+  renderProgressBar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showStep(step) {
+  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+}
+
+function buildReview() {
+  const container = document.getElementById('essayReview');
+  const title = getTitle();
+  let missing = 0;
+  let totalWords = 0;
+
+  let html = '';
+  if (title) {
+    html += `<div class="review-section"><h3>Prescribed Title</h3><div class="content">${title.text}</div></div>`;
+  }
+
+  SECTION_NAMES.forEach((name, i) => {
+    const key = SECTION_KEYS[i];
+    const text = state.sections[key] || '';
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    totalWords += words;
+
+    html += `<div class="review-section">
+      <h3>${name}</h3>
+      <div class="content ${!text.trim() ? 'empty' : ''}">${text.trim() || '(Not yet written)'}</div>
+    </div>`;
+    if (!text.trim()) missing++;
+  });
+
+  container.innerHTML = html;
+  document.getElementById('totalWordCount').textContent = totalWords;
+
+  // Add warning if over limit
+  const existing = container.querySelector('.word-limit-warning');
+  if (totalWords > 1600) {
+    if (!existing) {
+      const warn = document.createElement('div');
+      warn.className = 'pointers';
+      warn.innerHTML = `<div class="pointers-title">Warning</div><ul><li>Your essay is ${totalWords} words, exceeding the 1,600-word maximum. Consider editing for concision.</li></ul>`;
+      container.appendChild(warn);
+    }
+  } else {
+    if (existing) existing.remove();
+  }
+}
+
+function exportEssay() {
+  const title = getTitle();
+  if (!title) return;
+
+  // Save latest text
+  if (state.currentStep >= 1 && state.currentStep <= 5) {
+    const idx = state.currentStep - 1;
+    if (idx >= 0 && idx < SECTION_KEYS.length) {
+      state.sections[SECTION_KEYS[idx]] = document.getElementById(SECTION_INPUTS[idx]).value;
+    }
+  }
+
+  const lines = [];
+  lines.push('THEORY OF KNOWLEDGE ESSAY');
+  lines.push('Session: ' + SESSIONS[state.session].label);
+  lines.push('Prescribed Title: ' + title.text);
+  lines.push('');
+  lines.push('─'.repeat(60));
+  lines.push('');
+
+  SECTION_NAMES.forEach((name, i) => {
+    const key = SECTION_KEYS[i];
+    const text = (state.sections[key] || '').trim();
+    if (text) {
+      lines.push(name.toUpperCase());
+      lines.push('');
+      lines.push(text);
+      lines.push('');
+      lines.push('─'.repeat(60));
+      lines.push('');
+    }
+  });
+
+  const content = lines.join('\n');
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tok-essay-${SESSIONS[state.session].label.replace(/\s+/g, '-').toLowerCase()}-title-${title.num}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Session tabs
+document.getElementById('sessionTabs').addEventListener('click', (e) => {
+  const tab = e.target.closest('.session-tab');
+  if (!tab) return;
+  state.session = parseInt(tab.dataset.session);
+  state.titleIndex = -1;
+  document.querySelectorAll('.session-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  renderTitleGrid();
+  updateChartStartBtn();
+});
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  if (state.titleIndex < 0) return;
+  goToStep(1);
+});
+
+// Word count listeners
+SECTION_INPUTS.forEach((id, i) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    const text = el.value.trim();
+    const count = text ? text.split(/\s+/).length : 0;
+    const countEl = document.getElementById(id.replace('Input', 'Count'));
+    if (countEl) countEl.textContent = count;
+    // Save to state
+    state.sections[SECTION_KEYS[i]] = el.value;
+  });
+});
+
+// Init
+renderTitleGrid();
+renderProgressBar();
+</script>
+</body>
+</html>

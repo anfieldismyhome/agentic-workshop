@@ -1,6 +1,6 @@
 import os
 import psycopg2
-from flask import Flask
+from flask import Flask, send_file
 
 app = Flask(__name__)
 
@@ -12,6 +12,10 @@ DATABASE_URL = os.getenv(
 @app.route("/")
 def home():
     return "Hello from Agentic Workshop"
+
+@app.route("/tok")
+def tok():
+    return send_file("tok.html")
 
 @app.route("/db-check")
 def db_check():
